@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class BoidController : MonoBehaviour
 {
-    public GameObject boidGroup;
-    public int boidAmount;
-    GameObject[] boids;
+    public int boidAmount = 5;
+    public Boid animalPrefab;
+    Boid[] boids;
 
     // Initialize array of boids
     void Start()
     {
-        boids = new GameObject[boidGroup.transform.childCount];
+        boids = new Boid[boidAmount];
+
         for (int i = 0; i < boids.Length; i++)
         {
-            boids[i] = boidGroup.transform.GetChild(i).gameObject;
+           boids[i] = Instantiate<Boid>(animalPrefab);
         }
-
         InitBoidPositions();
     }
 
