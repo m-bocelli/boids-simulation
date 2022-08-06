@@ -6,6 +6,7 @@ public class BoidController : MonoBehaviour
 {
     public int boidAmount = 5;
     public Boid animalPrefab;
+    public int boidSpacing = 5;
     Boid[] boids;
 
     // Initialize array of boids
@@ -36,11 +37,13 @@ public class BoidController : MonoBehaviour
         //  apply movement each time step based on updated velocity
 
         Vector3 offset1;
+        Vector3 offset2;
 
         for (int i = 0; i < boids.Length; i++) {
             offset1 = Rule1(boids[i]);
+            offset2 = Rule2(boids[i]);
 
-            boids[i].velocity += offset1;
+            boids[i].velocity += offset1 + offset2;
             boids[i].transform.position += boids[i].velocity * Time.deltaTime;
             // Rotate boid smoothly (through interpolation) towards its movement dirtection
             boids[i].transform.rotation = Quaternion.Slerp(boids[i].transform.rotation, Quaternion.LookRotation(boids[i].velocity.normalized), Time.deltaTime * 5f);
@@ -67,7 +70,24 @@ public class BoidController : MonoBehaviour
     {
         Vector3 centerOfBoids = CalculateCenterOfBoids(boid);
         // Boids move 0.1% of the way towards the center each frame
-        return (centerOfBoids- boid.transform.position) / 1000;
+        return (centerOfBoids - boid.transform.position) / 1000;
+    }
+
+    Vector3 Rule2(Boid boid)
+    {
+        Vector3 moveAwayDistance = Vector3.zero;
+
+        for (int i = 0; i < boids.Length; i++) {
+            if (boids[i] != boid) {
+                // If the distance between the boid and other is less than the given spacing, then
+                // the boid's position is offset by said distance in the reverse direction
+                if (Mathf.Abs(Vector3.Distance(boids[i].transform.position, boid.transform.position)) < boidSpacing) {
+                    moveAwayDistance -= boids[i].transform.position - boid.transform.position;
+                }
+            }
+        }
+
+        return moveAwayDistance;
     }
 
     // Calculates the center of the flock of boids, ignoring the passed
@@ -79,7 +99,7 @@ public class BoidController : MonoBehaviour
         for(int i = 0; i < boids.Length; i++)
         {   
             // Only consider the position of boids which are not the one passed
-            if (boids[i].transform.position != boid.transform.position) {
+            if (boids[i] != boid) {
                 totalPositionOfBoids += boids[i].transform.position;
             }
         }
