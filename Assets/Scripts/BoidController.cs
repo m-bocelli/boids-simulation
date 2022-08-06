@@ -17,9 +17,10 @@ public class BoidController : MonoBehaviour
         {
            boids[i] = Instantiate<Boid>(animalPrefab);
         }
-        
+
         InitBoidPositions();
 
+        // Debug
         for (int i = 0; i < boids.Length; i++) {
             // Value should be slightly different for each boid
             print(CalculateCenterOfBoids(boids[i]));
@@ -33,6 +34,17 @@ public class BoidController : MonoBehaviour
         //  store results of three rule methods in three vectors
         //  apply vector results to velocity of current boid
         //  apply movement each time step based on updated velocity
+
+        Vector3 offset1;
+
+        for (int i = 0; i < boids.Length; i++) {
+            offset1 = Rule1(boids[i]);
+
+            boids[i].velocity += offset1;
+            boids[i].transform.position += boids[i].velocity * Time.deltaTime;
+            // Rotate boid smoothly (through interpolation) towards its movement dirtection
+            boids[i].transform.rotation = Quaternion.Slerp(boids[i].transform.rotation, Quaternion.LookRotation(boids[i].velocity.normalized), Time.deltaTime * 5f);
+        }
         
     }
 
@@ -48,6 +60,14 @@ public class BoidController : MonoBehaviour
             }
             boids[i].transform.position = new Vector3 (xPos, Random.Range(0.2f, 7f), Random.Range(-9f, 9f));
         }
+    }
+
+    // Boids fly towards the center position of neighboring boids
+    Vector3 Rule1(Boid boid)
+    {
+        Vector3 centerOfBoids = CalculateCenterOfBoids(boid);
+        // Boids move 0.1% of the way towards the center each frame
+        return (centerOfBoids- boid.transform.position) / 1000;
     }
 
     // Calculates the center of the flock of boids, ignoring the passed
