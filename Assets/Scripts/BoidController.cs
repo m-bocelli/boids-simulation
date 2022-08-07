@@ -12,6 +12,7 @@ public class BoidController : MonoBehaviour
     public int boidSpacing = 5; // Units between boids allowed before avoiding
     
     Boid[] boids;
+    delegate Vector3 AverageDelegate(Boid boid);
 
     // Initialize array of boids
     void Start()
@@ -57,11 +58,12 @@ public class BoidController : MonoBehaviour
     // Boids fly towards the center position of neighboring boids
     Vector3 CohesionOffset(Boid boid)
     {
-        Vector3 centerOfBoids = CalculateCenterOfBoids(boid);
+        Vector3 centerOfBoids = CalculateAverageOfVectors(boid, boid => boid.transform.position);
         // Boids move 0.1% of the way towards the center each frame
         return (centerOfBoids - boid.transform.position) * centeringFactor;
     }
 
+    // Boids move away from other boids when too close (distance adjusted by boidSpacing var)
     Vector3 AvoidOtherBoids(Boid boid)
     {
         Vector3 repulsion = Vector3.zero;
@@ -71,7 +73,7 @@ public class BoidController : MonoBehaviour
                 // If the distance between the boid and other is less than the given spacing, then
                 // the boid's position is offset by said distance in the reverse direction
                 if (Vector3.Distance(boids[i].transform.position, boid.transform.position) < boidSpacing) {
-                    repulsion -= (boids[i].transform.position - boid.transform.position);
+                    repulsion += boid.transform.position - boids[i].transform.position;
                 }
             }
         }
@@ -79,51 +81,35 @@ public class BoidController : MonoBehaviour
         return repulsion * repulsionFactor;
     }
 
-    // Boid's velocity is slightly adjusted in order to align it with its neighbors.
+    // Boid's velocity is slightly adjusted in order to align it with its neighbors
     Vector3 AlignVelocity(Boid boid)
     {
-        Vector3 averageVelocity = CalculateAverageVelocity(boid);
+        Vector3 averageVelocity = CalculateAverageOfVectors(boid, boid => boid.velocity);
 
         return (averageVelocity - boid.velocity) * matchNeighborFactor;
     }
 
-    // Auxillary function for the calculation of the average velocity of the boids
-    // excluding the one passed as an argument.
-    Vector3 CalculateAverageVelocity(Boid boid)
+    // Auxillary function for the calculation of the average center of the flock
+    // for rule 1 and average velocities for rule 3.
+    Vector3 CalculateAverageOfVectors(Boid boid, AverageDelegate vectorValue)
     {
-        Vector3 averageVelocity = Vector3.zero;
+        Vector3 average = Vector3.zero;
 
-        for (int i = 0; i < boids.Length; i++) {
-            if (boids[i] != boid) {
-                averageVelocity += boids[i].velocity;
+        foreach (Boid b in boids) {
+            // Current boid's vector is excluded from the operation so each boid
+            // has its own perspective of the flock.
+            if (b != boid) {
+                average += vectorValue(b);
             }
         }
-        averageVelocity /= (boids.Length -1);
-
-        return averageVelocity;
-    }
-
-    // Calculates the center of the flock of boids, excluding the passed
-    // argument boid's position.
-    Vector3 CalculateCenterOfBoids(Boid boid)
-    {
-        Vector3 centerOfBoids = Vector3.zero;
-
-        for (int i = 0; i < boids.Length; i++) {   
-            // Only consider the position of boids which are not the one passed
-            if (boids[i] != boid) {
-                centerOfBoids += boids[i].transform.position;
-            }
-        }
-        centerOfBoids /= (boids.Length - 1);
-
-        return centerOfBoids;
+        average /= (boids.Length -1);
+        return average;
     }
 
     // Boid's speed is limited to better simulate real animal speeds
     void LimitBoidVelocity(Boid boid) 
     {
-        int speedLimit = 10;
+        int speedLimit = 13;
         // Magnitude of a boid's velocity is speed
         if (boid.velocity.magnitude > speedLimit) {
             boid.velocity = boid.velocity.normalized * speedLimit;

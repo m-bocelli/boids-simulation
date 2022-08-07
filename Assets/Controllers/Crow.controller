@@ -35,7 +35,7 @@ AnimatorController:
   m_Name: Crow
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: Cycle Offset
+  - m_Name: cycleOffset
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
