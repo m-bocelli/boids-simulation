@@ -10,7 +10,8 @@ public class BoidController : MonoBehaviour
     public float repulsionFactor = 0.05f; // Speed at which boids turn away from each other (%)
     public float matchNeighborFactor = 0.05f; // Percentage of neighbors' velocity that will be added to boid
     public int boidSpacing = 5; // Units between boids allowed before avoiding
-    
+    public int boidViewRange = 10; // How far each boid can see
+
     Boid[] boids;
     delegate Vector3 AverageDelegate(Boid boid);
 
@@ -22,6 +23,7 @@ public class BoidController : MonoBehaviour
         for (int i = 0; i < boids.Length; i++)
         {
            boids[i] = Instantiate<Boid>(boidPrefab);
+           boids[i].perchingTimer = Random.Range(1f, 5f);
         }
 
         InitBoidPositions();
@@ -33,6 +35,15 @@ public class BoidController : MonoBehaviour
         Vector3 offset1, offset2, offset3, offset4;
 
         for (int i = 0; i < boids.Length; i++) {
+            if (boids[i].isPerching) {
+                if(boids[i].perchingTimer > 0){
+                    boids[i].perchingTimer -= Time.deltaTime;
+                    continue;
+                } else {
+                    boids[i].isPerching = false;
+                }
+            }
+            
             offset1 = CohesionOffset(boids[i]);
             offset2 = AvoidOtherBoids(boids[i]);
             offset3 = AlignVelocity(boids[i]);
@@ -52,6 +63,7 @@ public class BoidController : MonoBehaviour
     {
         for (int i = 0; i < boids.Length; i++) {
             boids[i].transform.position = new Vector3 (Random.Range(-9f,9f), Random.Range(0.2f, 7f), Random.Range(-9f, 9f));
+            boids[i].velocity = new Vector3 (Random.Range(1f, 3f), Random.Range(1f, 3f), Random.Range(1f, 3f));
         }
     }
 
@@ -118,8 +130,11 @@ public class BoidController : MonoBehaviour
 
     Vector3 KeepInBounds(Boid boid)
     {
-        int xMin = -10, xMax = 10, yMin = 1, yMax = 10, zMin = -10, zMax = 10;
+        int xMin = -10, xMax = 10, yMin = 0, yMax = 10, zMin = -10, zMax = 10;
+        int groundLevel = 0;
         Vector3 velocityOffset = Vector3.zero;
+        Vector3 perchPosition = boid.transform.position;
+
 
         if (boid.transform.position.x < xMin) {
             velocityOffset.x = 1;
@@ -133,6 +148,12 @@ public class BoidController : MonoBehaviour
             velocityOffset.z = 1;
         } else if (boid.transform.position.z > zMax) {
             velocityOffset.z = -1;
+        }
+
+        if (boid.transform.position.y < groundLevel) {
+            perchPosition.y = groundLevel;
+            boid.transform.position = perchPosition;
+            boid.isPerching = true;
         }
 
         return velocityOffset;
