@@ -14,6 +14,8 @@ public class BoidController : MonoBehaviour
 
     Boid[] boids; // Array of boids
     delegate Vector3 AverageDelegate(Boid boid); // Delegate used to averages of vector attributes of the boids
+    Animator animator;
+    int isPerchedHash;
 
     // Initialize array of boids
     void Start()
@@ -26,7 +28,19 @@ public class BoidController : MonoBehaviour
             boids[i].perchingTimer = Random.Range(1f, 5f);
         }
 
+        isPerchedHash = Animator.StringToHash("isPerched");
+
         InitBoidPositions();
+    }
+
+    void HandleBoidAnimations(Boid boid)
+    {
+        animator = boid.GetComponent<Animator>();
+        if(boid.isPerching){
+            animator.SetBool(isPerchedHash, true);
+        } else {
+            animator.SetBool(isPerchedHash, false);
+        }
     }
 
     // Set the boids to a random position within the bounds of the plane
@@ -44,6 +58,7 @@ public class BoidController : MonoBehaviour
         Vector3 offset1, offset2, offset3, offset4;
 
         for (int i = 0; i < boids.Length; i++) {
+            HandleBoidAnimations(boids[i]);
             if (boids[i].isPerching) {
                 // If boid is perching start timer and do not apply velocities
                 if(boids[i].perchingTimer > 0){

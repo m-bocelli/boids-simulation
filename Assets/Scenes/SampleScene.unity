@@ -153,11 +153,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boidPrefab: {fileID: 1491056402968570447, guid: 8dcc4cfd850595544a2d0b1311726318, type: 3}
-  boidAmount: 30
+  boidAmount: 20
   centeringFactor: 0.005
   repulsionFactor: 0.05
   matchNeighborFactor: 0.05
   boidSpacing: 3
+  boidViewRange: 10
 --- !u!4 &78638743
 Transform:
   m_ObjectHideFlags: 0
@@ -201,9 +202,9 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 0.8392157, g: 1, b: 0.97760665, a: 1}
-  m_Intensity: 1
-  m_Range: 10
+  m_Color: {r: 0.621173, g: 0.9339623, b: 0.88818824, a: 1}
+  m_Intensity: 3
+  m_Range: 11.05
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -260,7 +261,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 2.289, z: 0}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -303,8 +304,8 @@ Camera:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.2784314, g: 0.2784314, b: 0.2784314, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
