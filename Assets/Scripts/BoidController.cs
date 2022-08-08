@@ -4,24 +4,31 @@ using UnityEngine;
 
 public class BoidController : MonoBehaviour
 {
+    // Git cmd line: 
+    [Header("Init Vars")]
     public Boid boidPrefab; // Animal to represent a boid
     public int boidAmount = 5; // Amount of boids (cannot be changed while simulating)
+
+    [Header("Behavior Vars")]
     public float centeringFactor = 0.005f; // Speed at which boids approach the center of all boids
     public float repulsionFactor = 0.05f; // Speed at which boids turn away from each other
     public float matchNeighborFactor = 0.05f; // Percentage of neighbors' velocity that will be added to boid
     public int boidSpacing = 5; // Units between boids allowed before avoiding
     public int boidViewRange = 10; // How far each boid can see
 
+    [Header("Flight Boundaries")]
+    public Vector3 maxBoundaries;
+    public Vector3 minBoundaries;
+
     Boid[] boids; // Array of boids
     delegate Vector3 AverageDelegate(Boid boid); // Delegate used to averages of vector attributes of the boids
     Animator animator;
     int isPerchedHash;
 
-    // Initialize array of boids
     void Start()
     {
         boids = new Boid[boidAmount];
-
+        // Initialize array of boids
         for (int i = 0; i < boids.Length; i++)
         {
             boids[i] = Instantiate<Boid>(boidPrefab);
@@ -36,6 +43,7 @@ public class BoidController : MonoBehaviour
     void HandleBoidAnimations(Boid boid)
     {
         animator = boid.GetComponent<Animator>();
+
         if(boid.isPerching){
             animator.SetBool(isPerchedHash, true);
         } else {
@@ -47,8 +55,8 @@ public class BoidController : MonoBehaviour
     void InitBoidPositions()
     {
         for (int i = 0; i < boids.Length; i++) {
-            boids[i].transform.position = new Vector3 (Random.Range(-9f,9f), Random.Range(0.2f, 7f), Random.Range(-9f, 9f));
-            boids[i].velocity = new Vector3 (Random.Range(1f, 3f), Random.Range(1f, 3f), Random.Range(1f, 3f));
+            boids[i].transform.position = new Vector3 (Random.Range(-9f,9f), Random.Range(1f, 7f), Random.Range(-9f, 9f));
+            //boids[i].velocity = new Vector3 (Random.Range(1f, 3f), Random.Range(1f, 3f), Random.Range(1f, 3f));
         }
     }
 
@@ -59,6 +67,7 @@ public class BoidController : MonoBehaviour
 
         for (int i = 0; i < boids.Length; i++) {
             HandleBoidAnimations(boids[i]);
+
             if (boids[i].isPerching) {
                 // If boid is perching start timer and do not apply velocities
                 if(boids[i].perchingTimer > 0){
@@ -131,7 +140,7 @@ public class BoidController : MonoBehaviour
         foreach (Boid b in boids) {
             // Current boid's vector is excluded from the operation so each boid
             // has its own perspective of the flock.
-            if (b.transform.position != boid.transform.position && !b.isPerching) {
+            if (b.transform.position != boid.transform.position) {
                 average += vectorValue(b);
             }
         }
@@ -152,24 +161,22 @@ public class BoidController : MonoBehaviour
     // Boid flock is limited to arbitrary boundaries in order to better spectate
     Vector3 KeepInBounds(Boid boid)
     {
-        int xMin = -10, xMax = 10, yMin = 1, yMax = 10, zMin = -10, zMax = 10;
-        float groundLevel = 0.5f;
-        int turnFactor = 2;
+        float groundLevel = 0f;
+        int turnFactor = 1;
         Vector3 velocityOffset = Vector3.zero;
         Vector3 perchPosition = boid.transform.position;
 
-
-        if (boid.transform.position.x < xMin) {
+        if (boid.transform.position.x < minBoundaries.x) {
             velocityOffset.x = turnFactor;
-        } else if (boid.transform.position.x > xMax) {
+        } else if (boid.transform.position.x > maxBoundaries.x) {
             velocityOffset.x = -turnFactor;
-        } else if (boid.transform.position.y < yMin) {
+        } else if (boid.transform.position.y < minBoundaries.y) {
             velocityOffset.y = turnFactor;
-        } else if (boid.transform.position.y > yMax) {
+        } else if (boid.transform.position.y > maxBoundaries.y) {
             velocityOffset.y = -turnFactor;
-        } else if (boid.transform.position.z < zMin) {
+        } else if (boid.transform.position.z < minBoundaries.z) {
             velocityOffset.z = turnFactor;
-        } else if (boid.transform.position.z > zMax) {
+        } else if (boid.transform.position.z > maxBoundaries.z) {
             velocityOffset.z = -turnFactor;
         }
         // Once a boid reaches the ground it will begin to perch by locking its transform at ground level
