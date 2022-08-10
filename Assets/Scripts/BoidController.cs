@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BoidController : MonoBehaviour
@@ -77,6 +75,7 @@ public class BoidController : MonoBehaviour
     {
         Vector3 offset1, offset2, offset3, offset4;
         HandleFlockAttributes();
+        
 
         for (int i = 0; i < boids.Length; i++) {
             HandleBoidAnimations(boids[i]);
@@ -176,7 +175,7 @@ public class BoidController : MonoBehaviour
     Vector3 KeepInBounds(Boid boid)
     {
         float groundLevel = 0f;
-        int turnFactor = 1;
+        int turnFactor = 2;
         Vector3 velocityOffset = Vector3.zero;
         Vector3 perchPosition = boid.transform.position;
 
