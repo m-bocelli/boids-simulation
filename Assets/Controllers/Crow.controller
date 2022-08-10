@@ -9,7 +9,7 @@ AnimatorState:
   m_PrefabAsset: {fileID: 0}
   m_Name: Flying
   m_Speed: 1
-  m_CycleOffset: 0
+  m_CycleOffset: 1
   m_Transitions:
   - {fileID: -5552132233048627486}
   m_StateMachineBehaviours: []
@@ -25,7 +25,7 @@ AnimatorState:
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
-  m_CycleOffsetParameter: Cycle Offset
+  m_CycleOffsetParameter: cycleOffset
   m_TimeParameter: 
 --- !u!1102 &-6902528790550666066
 AnimatorState:

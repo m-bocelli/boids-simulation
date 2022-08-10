@@ -153,14 +153,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boidPrefab: {fileID: 1491056402968570447, guid: 8dcc4cfd850595544a2d0b1311726318, type: 3}
-  boidAmount: 10
+  boidAmount: 20
   centeringFactor: 0.005
   repulsionFactor: 0.05
   matchNeighborFactor: 0.05
   boidSpacing: 3
   boidViewRange: 10
   maxBoundaries: {x: 10, y: 10, z: 10}
-  minBoundaries: {x: -10, y: 0.5, z: -10}
+  minBoundaries: {x: -10, y: 0.25, z: -10}
 --- !u!4 &78638743
 Transform:
   m_ObjectHideFlags: 0
