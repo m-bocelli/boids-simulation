@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BoidController : MonoBehaviour
 {
-    // Git cmd line: 
     [Header("Init Vars")]
     public Boid boidPrefab; // Animal to represent a boid
     public int boidAmount = 5; // Amount of boids (cannot be changed while simulating)
