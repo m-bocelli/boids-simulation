@@ -104,7 +104,6 @@ public class BoidController : MonoBehaviour
             boids[i].transform.position += boids[i].velocity * Time.deltaTime;
             // Rotate boid smoothly (through interpolation) towards its movement dirtection
             boids[i].transform.rotation = Quaternion.Slerp(boids[i].transform.rotation, Quaternion.LookRotation(boids[i].velocity.normalized), Time.deltaTime * 5f);
-            print(boids[i].velocity.magnitude);
         }
         
     }

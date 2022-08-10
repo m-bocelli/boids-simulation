@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class CameraDrag : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public int mouseSensitivity = 10;
+
+    Vector2 rotation;
+
     void Start()
     {
-        
+        Camera.main.transform.parent = transform;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        Vector2 mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
+
+        rotation.y += mouseInput.x;
+        rotation.x += mouseInput.y;
         
+        rotation.x = Mathf.Clamp(rotation.x, 0f, 25f);
+        //transform.Rotate(Vector3.up * Time.deltaTime * mouseInput.x, Space.World);
+        //transform.Rotate(Vector3.right * Time.deltaTime * mouseInput.y, Space.World);
+        transform.eulerAngles = new Vector3(rotation.x, rotation.y, 0);
     }
 }
