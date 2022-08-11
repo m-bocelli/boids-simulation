@@ -32,7 +32,7 @@ public class BoidController : MonoBehaviour
         for (int i = 0; i < boids.Length; i++)
         {
             boids[i] = Instantiate<Boid>(boidPrefab);
-            boids[i].perchingTimer = Random.Range(1f, 5f);
+            boids[i].perchingTimer = Random.Range(1, 4);
         }
         // Initialize animator vars
         isPerchedHash = Animator.StringToHash("isPerched");
@@ -58,7 +58,9 @@ public class BoidController : MonoBehaviour
     void InitBoidPositions()
     {
         for (int i = 0; i < boids.Length; i++) {
-            boids[i].transform.position = new Vector3 (Random.Range(-9f,9f), Random.Range(1f, 7f), Random.Range(-9f, 9f));
+            boids[i].transform.position = new Vector3 (Random.Range(minBoundaries.x + 1f, maxBoundaries.x - 1f), 
+                                                        Random.Range(minBoundaries.y + 1f, maxBoundaries.y -1f), 
+                                                        Random.Range(minBoundaries.z + 1f, maxBoundaries.z - 1f));
             boids[i].velocity = new Vector3 (Random.Range(2f, 5f), Random.Range(2f, 5f), Random.Range(2f, 5f));
         }
     }
@@ -70,13 +72,12 @@ public class BoidController : MonoBehaviour
         matchNeighborFactor = Mathf.Clamp(matchNeighborFactor, 0f, 0.05f);
     }
 
-    // Move boids each frame based on three rules
+    // Move boids each frame based on rules
     void Update()
     {
         Vector3 offset1, offset2, offset3, offset4;
         HandleFlockAttributes();
         
-
         for (int i = 0; i < boids.Length; i++) {
             HandleBoidAnimations(boids[i]);
 
@@ -88,7 +89,7 @@ public class BoidController : MonoBehaviour
                 } else {
                     // Once timer has ran out, give new timer length and rejoin flock
                     boids[i].isPerching = false;
-                    boids[i].perchingTimer = Random.Range(1f, 5f);
+                    boids[i].perchingTimer = Random.Range(1, 4);
                 }
             }
             // Gather velocity offsets from rule methods below Update()
@@ -173,7 +174,7 @@ public class BoidController : MonoBehaviour
     // Boid flock is limited to arbitrary boundaries in order to better spectate
     Vector3 KeepInBounds(Boid boid)
     {
-        float groundLevel = 0f;
+        float groundLevel = minBoundaries.y - 0.05f;
         int turnFactor = 2;
         Vector3 velocityOffset = Vector3.zero;
         Vector3 perchPosition = boid.transform.position;
