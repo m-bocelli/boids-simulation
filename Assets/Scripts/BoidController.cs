@@ -9,7 +9,7 @@ public class BoidController : MonoBehaviour
     [Header("Behavior Vars")]
     public float centeringFactor = 0.005f; // Speed at which boids approach the center of all boids
     public float repulsionFactor = 0.05f; // Speed at which boids turn away from each other
-    public float matchNeighborFactor = 0.05f; // Percentage of neighbors' velocity that will be added to boid
+    public float matchingFactor = 0.05f; // Percentage of neighbors' velocity that will be added to boid
     public int boidSpacing = 5; // Units between boids allowed before avoiding
     public int boidViewRange = 10; // How far each boid can see
 
@@ -69,7 +69,7 @@ public class BoidController : MonoBehaviour
     {
         centeringFactor = Mathf.Clamp(centeringFactor, 0f, 0.01f);
         repulsionFactor = Mathf.Clamp(repulsionFactor, 0.05f, 0.1f);
-        matchNeighborFactor = Mathf.Clamp(matchNeighborFactor, 0f, 0.05f);
+        matchingFactor = Mathf.Clamp(matchingFactor, 0f, 0.05f);
     }
 
     // Move boids each frame based on rules
@@ -141,7 +141,7 @@ public class BoidController : MonoBehaviour
     {
         // Average of velocity vectors of all other boids is calculated
         Vector3 averageVelocity = CalculateAverageOfVectors(boid, boid => boid.velocity);
-        return (averageVelocity - boid.velocity) * matchNeighborFactor;
+        return (averageVelocity - boid.velocity) * matchingFactor;
     }
 
     // Auxillary function for the calculation of the average center of the flock
@@ -157,7 +157,8 @@ public class BoidController : MonoBehaviour
                 average += vectorValue(b);
             }
         }
-        average /= (boids.Length -1);
+
+        average /= (boids.Length - 1);
         return average;
     }
 
@@ -202,4 +203,18 @@ public class BoidController : MonoBehaviour
         return velocityOffset;
     }
 
+    public void SetCenteringFactor(float centeringFactor) 
+    {
+        this.centeringFactor = centeringFactor;
+    }
+
+    public void SetRepulsionFactor(float repulsionFactor)
+    {
+        this.repulsionFactor = repulsionFactor;
+    }
+
+    public void SetMatchingFactor(float matchingFactor)
+    {
+        this.matchingFactor = matchingFactor;
+    }
 }
