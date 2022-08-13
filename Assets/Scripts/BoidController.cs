@@ -11,14 +11,14 @@ public class BoidController : MonoBehaviour
     public float repulsionFactor = 0.05f; // Speed at which boids turn away from each other
     public float matchingFactor = 0.05f; // Percentage of neighbors' velocity that will be added to boid
     public int boidSpacing = 5; // Units between boids allowed before avoiding
-    public int boidViewRange = 10; // How far each boid can see
+    //public int boidViewRange = 10; // How far each boid can see
 
     [Header("Flight Boundaries")]
     public Vector3 maxBoundaries;
     public Vector3 minBoundaries;
 
     Boid[] boids; // Array of boids
-    delegate Vector3 AverageDelegate(Boid boid); // Delegate used to averages of vector attributes of the boids
+    delegate Vector3 AverageDelegate(Boid boid); // Delegate used to get averages of vector properties of the boids
 
     // Animation vars
     Animator animator;
@@ -157,7 +157,6 @@ public class BoidController : MonoBehaviour
                 average += vectorValue(b);
             }
         }
-
         average /= (boids.Length - 1);
         return average;
     }
