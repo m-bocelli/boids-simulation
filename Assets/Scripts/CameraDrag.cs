@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraDrag : MonoBehaviour
 {
@@ -16,6 +15,8 @@ public class CameraDrag : MonoBehaviour
 
     void OnMouseDrag()
     {
+        if (EventSystem.current.IsPointerOverGameObject()) return;
+        
         mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
 
         rotation.y += mouseInput.x;
