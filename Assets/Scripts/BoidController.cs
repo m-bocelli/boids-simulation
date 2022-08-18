@@ -57,11 +57,11 @@ public class BoidController : MonoBehaviour
     // Set the boids to a random position within the bounds of the plane
     void InitBoidPositions()
     {
-        for (int i = 0; i < boids.Length; i++) {
-            boids[i].transform.position = new Vector3 (Random.Range(minBoundaries.x + 1f, maxBoundaries.x - 1f), 
+        foreach (Boid boid in boids) {
+            boid.transform.position = new Vector3 (Random.Range(minBoundaries.x + 1f, maxBoundaries.x - 1f), 
                                                         Random.Range(minBoundaries.y + 1f, maxBoundaries.y -1f), 
                                                         Random.Range(minBoundaries.z + 1f, maxBoundaries.z - 1f));
-            boids[i].velocity = new Vector3 (Random.Range(2f, 5f), Random.Range(2f, 5f), Random.Range(2f, 5f));
+            boid.velocity = new Vector3 (Random.Range(2f, 5f), Random.Range(2f, 5f), Random.Range(2f, 5f));
         }
     }
 
@@ -78,33 +78,33 @@ public class BoidController : MonoBehaviour
         Vector3 offset1, offset2, offset3, offset4;
         HandleFlockAttributes();
         
-        for (int i = 0; i < boids.Length; i++) {
-            HandleBoidAnimations(boids[i]);
+        foreach (Boid boid in boids) {
+            HandleBoidAnimations(boid);
 
-            if (boids[i].isPerching) {
+            if (boid.isPerching) {
                 // If boid is perching start timer and do not apply velocities
-                if(boids[i].perchingTimer > 0){
-                    boids[i].perchingTimer -= Time.deltaTime;
+                if(boid.perchingTimer > 0){
+                    boid.perchingTimer -= Time.deltaTime;
                     continue;
                 } else {
                     // Once timer has ran out, give new timer length and rejoin flock
-                    boids[i].isPerching = false;
-                    boids[i].perchingTimer = Random.Range(1, 4);
+                    boid.isPerching = false;
+                    boid.perchingTimer = Random.Range(1, 4);
                 }
             }
             // Gather velocity offsets from rule methods below Update()
-            offset1 = FindFlockCenter(boids[i]);
-            offset2 = AvoidOtherBoids(boids[i]);
-            offset3 = AlignVelocity(boids[i]);
-            offset4 = KeepInBounds(boids[i]);
+            offset1 = FindFlockCenter(boid);
+            offset2 = AvoidOtherBoids(boid);
+            offset3 = AlignVelocity(boid);
+            offset4 = KeepInBounds(boid);
             // Apply offsets to the boid's current velocity
-            boids[i].velocity += offset1 + offset2 + offset3 + offset4;
+            boid.velocity += (offset1 + offset2 + offset3 + offset4);
             // Limit speed
-            LimitBoidVelocity(boids[i]);
+            LimitBoidVelocity(boid);
             // Move boid based on its velocity
-            boids[i].transform.position += boids[i].velocity * Time.deltaTime;
+            boid.transform.position += boid.velocity * Time.deltaTime;
             // Rotate boid smoothly (through interpolation) towards its movement dirtection
-            boids[i].transform.rotation = Quaternion.Slerp(boids[i].transform.rotation, Quaternion.LookRotation(boids[i].velocity.normalized), Time.deltaTime * 5f);
+            boid.transform.rotation = Quaternion.Slerp(boid.transform.rotation, Quaternion.LookRotation(boid.velocity.normalized), Time.deltaTime * 5f);
         }
         
     }
@@ -124,12 +124,12 @@ public class BoidController : MonoBehaviour
         // Vector to be applied to boids velocity indicating how to avoid the closest boid
         Vector3 repulsion = Vector3.zero;
 
-        for (int i = 0; i < boids.Length; i++) {
-            if (boids[i] != boid) {
+        foreach (Boid otherBoid in boids) {
+            if (otherBoid != boid) {
                 // If the distance between the boid and other is less than the given spacing, then
                 // the boid's position is offset in the reverse direction.
-                if (Vector3.Distance(boids[i].transform.position, boid.transform.position) < boidSpacing) {
-                    repulsion += boid.transform.position - boids[i].transform.position;
+                if (Vector3.Distance(otherBoid.transform.position, boid.transform.position) < boidSpacing) {
+                    repulsion += boid.transform.position - otherBoid.transform.position;
                 }
             }
         }
@@ -149,15 +149,21 @@ public class BoidController : MonoBehaviour
     Vector3 CalculateAverageOfVectors(Boid boid, AverageDelegate vectorValue)
     {
         Vector3 average = Vector3.zero;
+        int numOtherBoids = 0;
 
         foreach (Boid b in boids) {
             // Current boid's vector is excluded from the operation so each boid
             // has its own perspective of the flock.
-            if (b.transform.position != boid.transform.position && boidAmount > 1) {
+            if (b != boid && !b.isPerching) {
                 average += vectorValue(b);
+                numOtherBoids++;
             }
         }
-        average /= (boids.Length - 1);
+
+        if (numOtherBoids != 0) {
+            average /= (numOtherBoids);
+        }
+
         return average;
     }
 
@@ -175,7 +181,7 @@ public class BoidController : MonoBehaviour
     Vector3 KeepInBounds(Boid boid)
     {
         float groundLevel = minBoundaries.y - 0.05f;
-        int turnFactor = 2;
+        int turnFactor = 1;
         Vector3 velocityOffset = Vector3.zero;
         Vector3 perchPosition = boid.transform.position;
 
@@ -202,6 +208,7 @@ public class BoidController : MonoBehaviour
         return velocityOffset;
     }
 
+    // Methods for changing vars via UI
     public void SetCenteringFactor(float centeringFactor) 
     {
         this.centeringFactor = centeringFactor;
